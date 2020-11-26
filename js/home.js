@@ -69,9 +69,20 @@ function remove(obj) {
     if(!empRemove) return;
     const index = empList.map(empData => empData.id).indexOf(empRemove.id);
     empList.splice(index,1)
-    localStorage.setItem('EmployeeList', JSON.stringify(empList))
-    document.querySelector(".emp-count").textContent = empList.length;
-    createInnerHTML();
+    if(site_properties.use_local_storage.match("true")){
+        localStorage.setItem('EmployeeList', JSON.stringify(empList))
+        document.querySelector(".emp-count").textContent = empList.length;
+        createInnerHTML();
+    }else{
+        const deleteURL = site_properties.server_url + empRemove.id.toString();
+        makeServiceCall("DELETE", deleteURL, false)
+            .then(responseText => {
+                createInnerHTML();
+            })
+            .catch(error => {
+                console.log("DELETE Error Status:  " + JSON.stringify(error))
+            })
+    }
 }
 
 const update = (obj) => {
