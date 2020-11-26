@@ -1,13 +1,35 @@
 let empList;
 window.addEventListener('DOMContentLoaded', (event) => {
-    empList = getEmpListFromLocalStorage();
+    if(site_properties.use_local_storage.match("true")){
+        getEmpListFromLocalStorage();
+    }else{
+        getEmpListfromServer();
+    }   
+})
+
+function getEmpListfromServer(){
+    makeServiceCall("GET", site_properties.server_url, true)
+        .then(responseText => {
+            empList = JSON.parse(responseText);
+            processEmpListResponse();
+        })
+        .catch(error => {
+            console.log("GET Error Status:  " + JSON.stringify(error))
+            empList = [];
+            processEmpListResponse(); 
+        })
+
+}
+
+function getEmpListFromLocalStorage(){
+    empList = localStorage.getItem('EmployeeList') ? JSON.parse(localStorage.getItem('EmployeeList')) : [];
+    processEmpListResponse();
+}
+
+function processEmpListResponse() {
     document.querySelector(".emp-count").textContent = empList.length;
     createInnerHTML();
     localStorage.removeItem('editEmp')
-})
-
-function getEmpListFromLocalStorage(){
-    return localStorage.getItem('EmployeeList') ? JSON.parse(localStorage.getItem('EmployeeList')) : [];
 }
 
 const createInnerHTML = () => {
@@ -57,4 +79,40 @@ const update = (obj) => {
     if(!empUpdate) return;
     localStorage.setItem('editEmp', JSON.stringify(empUpdate))
     window.location.replace(site_properties.add_employee_page);
+}
+
+function makeServiceCall (methodType, url, async = true, data = null) {
+    return new Promise(function (resolve, reject) {
+        let xhr = new XMLHttpRequest();
+        xhr.onload = function () {
+            console.log(methodType + " State changed Called. Ready State:  " +  xhr.readyState + " Status: " + xhr.status)
+            if(xhr.readyState === 4){
+                if(xhr.status.toString().match('^[2][0-9]{2}$')){
+                    resolve(xhr.responseText)
+                }else if (xhr.status.toString().match('^[4,5][0-9]{2}$')){
+                    reject({
+                        status: xhr.status,
+                        statusText: xhr.statusText
+                    })
+                    console.log("XHR Failed")
+                }
+            }
+        }
+        xhr.onerror = function () {
+            reject( {
+                status: this.status,
+                statusText: xhttp.statusText
+            });
+        };
+        xhr.open(methodType, url, async);
+        if(data){
+            console.log(JSON.stringify(data));
+            xhr.setRequestHeader("Content-Type","application/json");
+            xhr.send(JSON.stringify(data));
+        }
+        else {
+            xhr.send();
+        }
+        console.log(methodType + " request sent to server")
+    });
 }

@@ -12,12 +12,12 @@
     },
     {
       "name": "Nikita",
-      "salary": 50000,
+      "salary": "50000",
       "id": 3
-    }
+    },
     {
-      "name": "Bibhav",
-      "salary": 30000,
+      "name": "Mark",
+      "salary": "25000",
       "id": 4
     }
   ]

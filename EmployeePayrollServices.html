@@ -17,7 +17,7 @@
                 margin-top: 50px;
             }
         </style>
-        <script src = "../AJAX/http_services.js"></script>
+        <script src = "../ClientServer/http_services.js"></script>
     </head>
     <body>
         <h1>The Test Series Result</h1>
@@ -42,13 +42,13 @@
                 deleteElem.textContent = "Delete Error Status: " + JSON.stringify(error);
             });
 
-            const emp = {"name": "Mark", "salary": 25000, "id": 5}
+            const emp = {"name": "Mark", "salary": "25000"}
             const postElem = document.querySelector("#post_services");
             const postURL = "http://127.0.0.1:3000/employees";
-            makePromiseCall("POST", postURL, true, empData).then(responseText => {
+            makeServiceCall("POST", postURL, true, emp).then(responseText => {
                 postElem.textContent = "New User Data: " + responseText;
             }).catch(error =>{
-                postElem.textContent = "post Error Status: " + JSON.stringify(error);
+                postElem.textContent = "Post Error Status: " + JSON.stringify(error);
             });
         </script>
     </body>

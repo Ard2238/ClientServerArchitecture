@@ -11,7 +11,7 @@
         "_salary": "500000",
         "_startDate": "29 Oct 2019",
         "_note": "All In One",
-        "_profilePic": "../assets/profile-images/Ellipse -3.png"
+        "_profile": "../assets/profile-images/Ellipse -3.png"
       },
       {
         "id": 2,
@@ -23,7 +23,7 @@
         "_salary": "500000",
         "_startDate": "29 Oct 2019",
         "_note": "Terrific Engineer",
-        "_profilePic": "../assets/profile-images/Ellipse -1.png"
+        "_profile": "../assets/profile-images/Ellipse -1.png"
       },
       {
         "_name": "Amarpa Shashanka Keerthi Kumar",
@@ -34,7 +34,7 @@
         "_salary": "400000",
         "_startDate": "29 Oct 2019",
         "_note": "",
-        "_profilePic": "../assets/profile-images/Ellipse -1.png",
+        "_profile": "../assets/profile-images/Ellipse -1.png",
         "id": 3
       }
     ]
