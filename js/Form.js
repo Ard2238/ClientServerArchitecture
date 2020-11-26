@@ -60,9 +60,13 @@ const save = (event) => {
     event.stopPropagation();
     try{
         populateEmployeeObject();
-        createAndUpdateLocalStorage();
-        reset();
-        window.location.replace(site_properties.home_page);        
+        if(site_properties.use_local_storage.match("true")){
+            createAndUpdateLocalStorage();
+            reset();
+            window.location.replace(site_properties.home_page);
+        }else{
+            createAndUpdateJSONServer();
+        }      
     }catch (e){
         return;
     }
@@ -81,6 +85,23 @@ function populateEmployeeObject(){
     employeePayrollObj._note = document.querySelector('#notes').value;
     let date = document.querySelector('#Day').value + " " + document.querySelector('#month').value + " " + document.querySelector('#year').value;
     employeePayrollObj._startDate = date;
+}
+
+function createAndUpdateJSONServer() {
+    let postURL = site_properties.server_url;
+    let method = "POST"
+    if(isUpdate) {
+        method = "PUT"
+        postURL = postURL + employeePayrollObj.id.toString();
+    }
+    makeServiceCall(method, postURL, true, employeePayrollObj)
+        .then(responseText => {
+            reset();
+            window.location.replace(site_properties.home_page);
+        })
+        .catch (error => {
+            throw error
+        })
 }
 
 function createAndUpdateLocalStorage() {
@@ -199,4 +220,40 @@ function setSelectedValues(propertyValue, value) {
             item.checked = true;
         }
     }); 
+}
+
+function makeServiceCall (methodType, url, async = true, data = null) {
+    return new Promise(function (resolve, reject) {
+        let xhr = new XMLHttpRequest();
+        xhr.onload = function () {
+            console.log(methodType + " State changed Called. Ready State:  " +  xhr.readyState + " Status: " + xhr.status)
+            if(xhr.readyState === 4){
+                if(xhr.status.toString().match('^[2][0-9]{2}$')){
+                    resolve(xhr.responseText)
+                }else if (xhr.status.toString().match('^[4,5][0-9]{2}$')){
+                    reject({
+                        status: xhr.status,
+                        statusText: xhr.statusText
+                    })
+                    console.log("XHR Failed")
+                }
+            }
+        }
+        xhr.onerror = function () {
+            reject( {
+                status: this.status,
+                statusText: xhttp.statusText
+            });
+        };
+        xhr.open(methodType, url, async);
+        if(data){
+            console.log(JSON.stringify(data));
+            xhr.setRequestHeader("Content-Type","application/json");
+            xhr.send(JSON.stringify(data));
+        }
+        else {
+            xhr.send();
+        }
+        console.log(methodType + " request sent to server")
+    });
 }
